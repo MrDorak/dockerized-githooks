@@ -1,0 +1,10 @@
+#!/bin/bash
+
+branch=$(git rev-parse --abbrev-ref HEAD)
+
+# If on a feature branch add tag [skip ci] to save unneeded deployment
+if [[ ${branch} == *"feature/"* ]]; then
+    if [[ $1 != *"[skip ci]"* && $1 != *"[ci skip]"* ]]; then
+        echo "[skip ci] (automatically added by commit-msg hook)" >> $1
+    fi
+fi

@@ -1,0 +1,48 @@
+#!/bin/bash
+
+modified_files=$(git diff --name-only ORIG_HEAD HEAD)
+docker_id=$(docker-compose ps -q php) # Replace php by docker's service name
+
+function has_changed() {
+    echo "Checking if $1 has changed"
+	echo ${modified_files} | grep -q $1 && eval "$2"
+}
+
+if [[ $(docker inspect -f '{{.State.Running}}' "${docker_id}") = false ]]; then
+    echo "${docker_id} is not running, skipping hook"
+    exit 0
+fi
+
+# Edit with your configuration
+if [[ -f hooks/conf.txt ]]
+then
+    config=$(cat hooks/conf.txt)
+else
+    if [[ -t 1 ]]; then
+        exec < /dev/tty
+        read -p "Choose your favorite webpack configuration, watch (w) or dev (d)" config && [[ $config == [dD] || $config == [dD][eE][vV] || $config == [wW] || $config == [wW][aA][tT][cC][hH] ]] || exit 1
+        if [[ "$config" == "d" || "$config" == "D" ]]; then
+            config="dev"
+        elif [[ "$config" == "w" || "$config" == "W" ]]; then
+            config="watch"
+        fi
+    else
+        echo "Output device is not a terminal, using webpack script configuration 'dev'"
+        config="dev"
+    fi
+    echo "$config" > hooks/conf.txt
+fi
+
+has_changed hooks/ "echo 'Changes found, copying hooks/ to .git/hooks' && docker exec -t "${docker_id}" yarn hooks" || echo "No change found"
+
+has_changed package.json "echo 'Changes found, running yarn install' && docker exec -t "${docker_id}" yarn install" || echo "No change found"
+
+if has_changed templates/ ; then
+    echo "Running script ${config}" && docker exec -d "${docker_id}" yarn "${config}"
+else
+    if [[ "${config}" == "watch" ]]; then
+        docker exec -d "${docker_id}" yarn "${config}"
+    fi
+fi
+
+echo 'Successfully merged'
