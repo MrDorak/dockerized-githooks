@@ -5,7 +5,7 @@ docker_id=$(docker-compose ps -q php) # Replace php by docker's service name
 
 function has_changed() {
     echo "Checking if $1 has changed"
-	echo ${modified_files} | grep -q $1 && eval "$2"
+    echo ${modified_files} | grep -q $1 && eval "$2"
 }
 
 if [[ $(docker inspect -f '{{.State.Running}}' "${docker_id}") = false ]]; then
@@ -37,6 +37,7 @@ has_changed hooks/ "echo 'Changes found, copying hooks/ to .git/hooks' && docker
 
 has_changed package.json "echo 'Changes found, running yarn install' && docker exec -t "${docker_id}" yarn install" || echo "No change found"
 
+# Change the directory to where your javascript and sass files are to run webpack
 if has_changed templates/ ; then
     echo "Running script ${config}" && docker exec -d "${docker_id}" yarn "${config}"
 else

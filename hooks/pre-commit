@@ -6,7 +6,7 @@ branchs_list=$(git branch -r)
 
 function has_changed() {
     echo "Checking if $1 has changed"
-	echo ${modified_files} | grep -q $1 && eval "$2"
+    echo ${modified_files} | grep -q $1 && eval "$2"
 }
 
 if [[ $(docker inspect -f '{{.State.Running}}' "${docker_id}") = false ]]; then
