@@ -18,13 +18,13 @@ npm run hooks
 
 - `commit-msg` : adds a [skip-ci] tag at the end of your commit if pushing on a feature branch
 
-- `pre-commit` : copies `hooks/` directory to if any change is detected and checks if there is any dependabot branch to 
+- `pre-commit` : copies `hooks/` directory to `.git/hooks/` if any change is detected and checks if there is any dependabot branch to 
 prompt to run 'yarn upgrade --latest' before committing
 
 - `post-merge` : creates a `conf.txt` file containing the prefered webpack config for future runs (defaults to 'dev') and 
-then copies `hooks/` directory, then runs 'yarn install' and then 'yarn run dev' (or 'yarn run watch' based on `conf.txt`) if any
+then copies `hooks/` directory to `.git/hooks/`, then runs 'yarn install' and then 'yarn run dev' (or 'yarn run watch' based on `conf.txt`) if any
  change is detected in the corresponding file or directory
 
-- `post-checkout` : same as `post-merge` copies `hooks/` directory, runs 'yarn install' and runs 'yarn run dev' (or 'yarn 
+- `post-checkout` : same as `post-merge` copies `hooks/` directory to `.git/hooks/`, runs 'yarn install' and runs 'yarn run dev' (or 'yarn 
 run watch' based on `conf.txt`) if any change is detected in the corresponding file or directory
 
