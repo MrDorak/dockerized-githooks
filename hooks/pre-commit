@@ -18,7 +18,7 @@ fi
 has_changed hooks/ "echo 'Changes found, copying hooks/ to .git/hooks' && docker exec -t "${docker_id}" yarn hooks" || echo "No change found"
 
 echo "Checking if there is any dependabot branch and if we're commiting on a develop branch"
-if [[ ${branchs_list} == *"dependabot/npm_and_yarn/"* && ${branch} == *"develop/"* ]]; then
+if [[ ${branchs_list} == *"dependabot/npm_and_yarn/"* && ${branch} == "develop" ]]; then
     echo "New dependabot branch found; please run 'yarn upgrade --latest'"
 else
     echo 'No dependabot branch found'
