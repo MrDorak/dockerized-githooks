@@ -3,6 +3,7 @@
 modified_files=$(git diff --cached --name-only)
 docker_id=$(docker-compose ps -q php) # Replace php by docker's service name
 branchs_list=$(git branch -r)
+branch=$(git rev-parse --abbrev-ref HEAD)
 
 function has_changed() {
     echo "Checking if $1 has changed"
@@ -14,10 +15,10 @@ if [[ $(docker inspect -f '{{.State.Running}}' "${docker_id}") = false ]]; then
     exit 0
 fi
 
-has_changed hooks/ "echo 'Changes found, copying hooks/ to .git/hooks' docker exec -t "${docker_id}" yarn hooks" || echo "No change found"
+has_changed hooks/ "echo 'Changes found, copying hooks/ to .git/hooks' && docker exec -t "${docker_id}" yarn hooks" || echo "No change found"
 
-echo "Checking if there is any dependabot branch"
-if [[ ${branchs_list} == *"dependabot/npm_and_yarn/"* ]]; then
+echo "Checking if there is any dependabot branch and if we're commiting on a develop branch"
+if [[ ${branchs_list} == *"dependabot/npm_and_yarn/"* && ${branch} == *"develop/"* ]]; then
     echo "New dependabot branch found; please run 'yarn upgrade --latest'"
 else
     echo 'No dependabot branch found'

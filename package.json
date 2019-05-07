@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Script used to copy hooks",
   "scripts": {
-    "hooks": "cp `ls ./hooks/* | grep -v conf.txt` .git/hooks/ && chmod -R a+x .git/hooks/"
+    "hooks": "cp `ls ./hooks/* | grep -v conf.txt` .git/hooks/ && chmod -R 755 .git/hooks/"
   },
   "author": "Dorian <dorianturle@hotmail.fr>",
   "license": "MIT"
