@@ -1,12 +1,12 @@
 # dockerized-githooks
 
-Some simple git hooks working in a dockerized environment
+Some simple git hooks running in a dockerized environment
 
 ## Setup
 
 Simply copy any git hook you want to use in a `hooks/` directory, configure the hook if needed.
 
-Add the follwing script in your `package.json`
+Add the following script in your `package.json`
 ```json
   "scripts": {
     "hooks": "cp `ls ./hooks/* | grep -v conf.txt` .git/hooks/ && chmod -R 755 .git/hooks/"
@@ -34,4 +34,3 @@ then copies `hooks/` directory to `.git/hooks/`, then runs 'yarn install' and th
 
 - `post-checkout` : same as `post-merge` copies `hooks/` directory to `.git/hooks/`, runs 'yarn install' and runs 'yarn run dev' (or 'yarn 
 run watch' based on `conf.txt`) if any change is detected in the corresponding file or directory
-
