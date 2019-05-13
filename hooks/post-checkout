@@ -20,8 +20,6 @@ else
     config="dev"
 fi
 
-has_changed hooks/ "echo 'Changes found, copying hooks/ to .git/hooks' && docker exec -t "${docker_id}" yarn hooks" || echo "No change found"
-
 has_changed package.json "echo 'Changes found, running yarn install' && docker exec -t "${docker_id}" yarn install" || echo "No change found"
 
 # Change the directory to where your javascript and sass files are to run webpack
