@@ -2,17 +2,31 @@
 
 modified_files=$(git diff --name-only $1 $2)
 docker_id=$(docker-compose ps -q php) # Replace php by docker's service name
+branch=$(git rev-parse --abbrev-ref HEAD)
 
 function has_changed() {
     echo "Checking if $1 has changed since last time"
     echo ${modified_files} | grep -q $1 && eval "$2"
 }
 
-if [[ $(docker inspect -f '{{.State.Running}}' "${docker_id}") = false ]]; then
+if [[ ${docker_id} = "" || $(docker inspect -f '{{.State.Running}}' "${docker_id}") = false ]]; then
     echo "${docker_id} is not running, skipping hook"
     exit 0
 fi
 
+# If "on_hotfix[...]true" exists in conf file, skip hooks as we're finishing a hotfix
+if grep -oq "on_hotfix.*true" hooks/conf.txt ; then
+    echo "❌  Checking-out on ${branch} after an hotfix, skipping hooks"
+    exit 0
+fi
+
+# If "webpack_config[...]" exists in conf file, this means we already have a configuration
+if grep -oq "webpack_config.*" hooks/conf.txt ; then
+    conf=$(grep -o 'webpack_config.*' hooks/conf.txt)
+    config=$(echo ${conf} | sed 's/.*:[[:space:]]*//')
+else
+    config="dev"
+fi
 # Edit with your configuration
 if [[ -f hooks/conf.txt ]]; then
     config=$(cat hooks/conf.txt)
@@ -20,11 +34,23 @@ else
     config="dev"
 fi
 
-has_changed package.json "echo 'Changes found, running yarn install' && docker exec -t "${docker_id}" yarn install" || echo "No change found"
+if has_changed package.json ; then
+    if [[ ${branch} == "master" || ${branch} == "develop" ]]; then
+        echo "Changes found, running yarn install" && docker exec -t "${docker_id}" yarn install
+    else
+        echo "Changes found, you should run yarn install to make sure you have the latest package.json dependencies"
+    fi
+else
+    echo "No change found"
+fi
 
 # Change the directory to where your javascript and sass files are to run webpack
 if has_changed templates/ ; then
-    echo "Running script ${config}" && docker exec -d "${docker_id}" yarn "${config}"
+    if [[ ${branch} == "master" || ${branch} == "develop" ]]; then
+        echo "Changes found, running yarn ${config}" && docker exec -d "${docker_id}" yarn "${config}"
+    else
+        echo "Changes found, you should run yarn ${config} to make sure you have the latest version of js/css"
+    fi
 else
     echo "No change found"
     if [[ "$config" == "watch" ]]; then

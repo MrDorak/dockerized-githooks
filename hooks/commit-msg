@@ -7,4 +7,11 @@ if [[ ${branch} == *"feature/"* ]]; then
     if [[ $1 != *"[skip ci]"* && $1 != *"[ci skip]"* ]]; then
         echo "[skip ci] (automatically added by commit-msg hook)" >> $1
     fi
+elif [[ ${branch} == *"hotfix/"* ]]; then
+    echo "⭕️  On hotfix, editing configuration file"
+    if grep -oq 'on_hotfix.*' hooks/conf.txt ; then
+        sed -i 's/^on_hotfix.*/on_hotfix : true/' hooks/conf.txt
+    else
+        echo "on_hotfix : true" >> hooks/conf.txt
+    fi
 fi

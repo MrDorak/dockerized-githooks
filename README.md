@@ -4,15 +4,15 @@ Some simple git hooks running in a dockerized environment
 
 ## Setup
 
-Simply copy any git hook you want to use in a `hooks/` directory, change the hook to your needs.
+Simply copy any git hook you want to use in a `hooks/` directory, change the hook as you need.
 
-Add the following script in your `package.json`
+Add the following in your `package.json`
 ```json
   "scripts": {
     "hooks": "chmod -R 755 hooks/ && git config core.hookspath hooks"
   }
 ```
-This script makes the whole `hooks/` executable and changes the default git hooks directory to `hooks/`. After that run 
+This makes the whole `hooks` directory executable and changes the default git hooks directory to `hooks` instead of `.git/hooks`. After that run 
 ```
 yarn hooks
 ```
@@ -24,8 +24,8 @@ yarn hooks
 - `commit-msg` : adds a [skip-ci] tag at the end of your commit if pushing on a feature branch
 
 - `post-merge` : creates a `conf.txt` file containing the prefered webpack config for future runs (defaults to 'dev') 
-and then runs 'yarn install' and then 'yarn run dev' (or 'yarn run watch' based on `conf.txt`) if any change is detected 
+then runs 'yarn install' and then 'yarn run dev' (or 'yarn run watch' based on `conf.txt`) if any change is detected 
 in the corresponding file or directory
 
-- `post-checkout` : same as `post-merge`, runs 'yarn install' and runs 'yarn run dev' (or 'yarn run watch' based on 
+- `post-checkout` : same as `post-merge`, runs 'yarn install' and then runs 'yarn run dev' (or 'yarn run watch' based on 
 `conf.txt`) if any change is detected in the corresponding file or directory
