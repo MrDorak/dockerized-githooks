@@ -27,12 +27,6 @@ if grep -oq "webpack_config.*" hooks/conf.txt ; then
 else
     config="dev"
 fi
-# Edit with your configuration
-if [[ -f hooks/conf.txt ]]; then
-    config=$(cat hooks/conf.txt)
-else
-    config="dev"
-fi
 
 if has_changed package.json ; then
     if [[ ${branch} == "master" || ${branch} == "develop" ]]; then
